@@ -2,6 +2,7 @@ import { Router } from "express";
 import {logoutUser , loginUser , registerUser , refreshAccessToken ,changeCurrentPassword, getCurrentUser, updateAccountDetails, updateUserAvatar, updateUserCoverImage, getUserChannelProfile, getWatchHistory} from "../controllers/user.controller.js";
 import {upload} from "../middlewares/multer.middleware.js"
 import {verifyJWT} from "../middlewares/auth.middleware.js"
+import { addComment, updateComment } from "../controllers/comment.controller.js";
 
 
 const router = Router()
@@ -29,6 +30,11 @@ router.route("/avatar").patch(verifyJWT ,upload.single("avatar") ,updateUserAvat
 router.route("/cover-image").patch(verifyJWT ,upload.single("coverImage") ,updateUserCoverImage)
 router.route("/c/:username").get(verifyJWT ,getUserChannelProfile)
 router.route("/history").get(verifyJWT ,getWatchHistory)
+
+//comment routes
+
+router.route("/add-comment").post(verifyJWT ,addComment)
+router.route("/update-comment").post(verifyJWT ,updateComment)
 
 
 export default router
