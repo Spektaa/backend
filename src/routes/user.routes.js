@@ -3,6 +3,8 @@ import {logoutUser , loginUser , registerUser , refreshAccessToken ,changeCurren
 import {upload} from "../middlewares/multer.middleware.js"
 import {verifyJWT} from "../middlewares/auth.middleware.js"
 import { addComment, updateComment } from "../controllers/comment.controller.js";
+import {publishAVideo} from "../controllers/video.controller.js";
+
 
 
 const router = Router()
@@ -30,6 +32,16 @@ router.route("/avatar").patch(verifyJWT ,upload.single("avatar") ,updateUserAvat
 router.route("/cover-image").patch(verifyJWT ,upload.single("coverImage") ,updateUserCoverImage)
 router.route("/c/:username").get(verifyJWT ,getUserChannelProfile)
 router.route("/history").get(verifyJWT ,getWatchHistory)
+
+//video routes
+
+router.route("/publish-video").post(verifyJWT ,upload.fields([{
+    name :"videoFile",
+    maxCount : 1
+}, {
+    name: "thumbnail",
+    maxCount : 1
+}]) ,publishAVideo)
 
 //comment routes
 

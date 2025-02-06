@@ -4,6 +4,7 @@ import {ApiError} from "../utils/ApiError.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
 import {User} from "../models/user.model.js"
+import {Video} from "../models/video.model.js"
 
 const getVideoComments = asyncHandler(async (req, res) => {
 
@@ -37,12 +38,19 @@ const addComment = asyncHandler(async (req, res) => {
 
     const {content , videoId} = req.body
 
+    const objectId = new mongoose.Types.ObjectId(videoId);
+
     if(!content)
         throw new ApiError(400 , "No comment added , Required Field")
 
-    if (!videoId) {
-        throw new ApiError(400, "A video ID is required to add a comment");
+    if (!mongoose.Types.ObjectId.isValid(videoId)) {
+        throw new ApiError(400, "Invalid video ID format");
     }
+
+    // const video = await Video.findById(objectId);
+    // if (!video) {
+    //     throw new ApiError(404, "Video not found");
+    // }
 
     const user =await User.findById(req.user._id).select("-password -refreshToken")
 
@@ -53,7 +61,7 @@ const addComment = asyncHandler(async (req, res) => {
 
     const comment = await Comment.create({
         content , 
-        videoId ,
+        video : objectId ,
         owner : user._id ,
     })
 
@@ -64,7 +72,6 @@ const addComment = asyncHandler(async (req, res) => {
     return res
     .status(200)
     .json(new ApiResponse(200 , comment , "Comment Added Sucessfully"))
-    
 
 })
 
