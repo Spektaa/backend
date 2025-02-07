@@ -3,7 +3,7 @@ import {logoutUser , loginUser , registerUser , refreshAccessToken ,changeCurren
 import {upload} from "../middlewares/multer.middleware.js"
 import {verifyJWT} from "../middlewares/auth.middleware.js"
 import { addComment, updateComment } from "../controllers/comment.controller.js";
-import {publishAVideo} from "../controllers/video.controller.js";
+import {publishAVideo , getVideoById , updateVideo} from "../controllers/video.controller.js";
 
 
 
@@ -43,10 +43,14 @@ router.route("/publish-video").post(verifyJWT ,upload.fields([{
     maxCount : 1
 }]) ,publishAVideo)
 
+router.route("/get-video/:videoId").get(verifyJWT ,getVideoById)
+router.route("/update-video").patch(verifyJWT , upload.single("videoFile"), updateVideo)
+
+
 //comment routes
 
 router.route("/add-comment").post(verifyJWT ,addComment)
-router.route("/update-comment").post(verifyJWT ,updateComment)
+router.route("/update-comment").post(verifyJWT ,  updateComment)
 
 
 export default router

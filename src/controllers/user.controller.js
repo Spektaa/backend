@@ -270,6 +270,7 @@ const updateAccountDetails = asyncHandler(async(req , res)=>{
 
 const updateUserAvatar =asyncHandler(async(req ,res) =>{
 
+    console.log(req.file);
     const avatarLocalPath = req.file?.path
 
     if(!avatarLocalPath)
@@ -403,7 +404,9 @@ const getUserChannelProfile = asyncHandler(async(req, res) => {
 
 })
 
+
 const getWatchHistory = asyncHandler(async(req, res) => {
+    
     const user = await User.aggregate([
         {
             $match: {

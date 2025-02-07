@@ -5,6 +5,7 @@ import {ApiError} from "../utils/ApiError.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
 import {uploadOnCloudinary} from "../utils/cloudinary.js"
+import { upload } from "../middlewares/multer.middleware.js"
 
 
 const getAllVideos = asyncHandler(async (req, res) => {
@@ -112,13 +113,63 @@ const publishAVideo = asyncHandler(async (req, res) => {
 })
 
 const getVideoById = asyncHandler(async (req, res) => {
+
     const { videoId } = req.params
-    //TODO: get video by id
+    
+    if(!videoId)
+        throw new ApiError(400 , "Send a valid video id ")
+
+    const video = await Video.findById(videoId);
+
+    if (!video) {
+        throw new ApiError(404, "Video not found");
+    }
+
+    return res.status(200)
+    .json(new ApiResponse(200 , video.videoFile , "Video Fetched Sucessfully"))
+
 })
 
 const updateVideo = asyncHandler(async (req, res) => {
-    const { videoId } = req.params
-    //TODO: update video details like title, description, thumbnail
+    const { videoId } = req.body
+
+    if(!videoId)
+        throw new ApiError(400 , "Send a valid video id ")
+
+    console.log(req.file);
+    console.log(req.body);
+    const videoLocalPath = req.file?.path
+
+    console.log("videoLocalPath" , videoLocalPath);
+
+    if(!videoLocalPath)
+        throw new ApiError(400 , "New Video is required")
+
+    const video = uploadOnCloudinary(videoLocalPath);
+
+    if(!video)
+        throw new ApiError(500 , "Error while updating video , retry")
+
+    const newVideo = await Video.findByIdAndUpdate(
+        videoId,
+        {
+            $set :{
+                videoFile : video.url
+            }
+        },
+        {
+            new : true
+        }
+    )
+
+    console.log("newvideo ", newVideo);
+    
+    if(!newVideo)
+        throw new ApiError("500" , "Error updating video , retry")
+
+    return res.status(200)
+    .json(new ApiResponse(200 , newVideo , "Video updated Sucessfully"))
+
 
 })
 
